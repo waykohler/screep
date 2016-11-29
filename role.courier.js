@@ -20,11 +20,22 @@ module.exports =
 
 		if(creep.memory.full)
 		{
+			var spawn = Game.spawns['Spawn1'];
+			if(spawn.room.name == creep.room.name && spawn.energyCapacity != spawn.energy)
+			{
+				creep.memory.target = spawn;
+				var ret = creep.transfer(spawn,RESOURCE_ENERGY);
+				if(ret == ERR_NOT_IN_RANGE)
+				{
+					creep.moveTo(spawn);
+					return;
+				}
+			}
 			while(globals.energyRequesters.length && _.sum(creep.carry))
 			{
 				globals.energyRequesters = util.sortByDistanceSticky(globals.energyRequesters,creep.pos, creep.memory.target);
-				//var dest = globals.energyRequesters.pop();
-				var dest = globals.energyRequesters[globals.energyRequesters.length - 1];
+				var dest = globals.energyRequesters.pop();
+				//var dest = globals.energyRequesters[globals.energyRequesters.length - 1];
 				creep.memory.target = dest.pos;
 				var ret = creep.transfer(dest,RESOURCE_ENERGY);
 				if(ret == ERR_NOT_IN_RANGE)
@@ -33,15 +44,7 @@ module.exports =
 					return;
 				}
 			}
-			var spawn = Game.spawns['Spawn1'];
-			if(spawn.energyCapacity == spawn.energy)
-			{
-				if(_.sum(spawn.carry) == creep.carryCapacity)
-				{
-					return;
-				}
-			}
-			else
+			if(spawn.energyCapacity != spawn.energy)
 			{
 				creep.memory.target = spawn;
 				var ret = creep.transfer(spawn,RESOURCE_ENERGY);
